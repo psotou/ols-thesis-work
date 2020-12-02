@@ -43,9 +43,8 @@ func main() {
 
 	alpha, beta := stat.LinearRegression(Xind, Y, weights, origin) // Vector Beta, con alpha = beta_0
 	r2 := stat.RSquared(Xind, Y, weights, alpha, beta)             // Calculated r squared
-
-	corrCoef := stat.Correlation(Xind, Y, weights) // calculated correlation coefficient
-	numObservations := float64(len(Xind))          // N observations
+	corrCoef := stat.Correlation(Xind, Y, weights)                 // calculated correlation coefficient
+	numObservations := float64(len(Xind))                          // N observations
 	pvalue := twoSidedPValue(corrCoef, numObservations)
 
 	fmt.Println("DATOS INGRESADOS PARA LA ESTIMACIÓN")
