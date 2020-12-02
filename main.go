@@ -27,9 +27,9 @@ func main() {
 		return
 	}
 
-	X := make([]float64, len(lines)-1)    // Vectior X -> rating madurez BIM
-	Y := make([]float64, len(lines)-1)    // Vectir Y -> desviación porcentual de costos
-	Xind := make([]float64, len(lines)-1) // Vectir Xind -> indicador de madurez BIM propuesto
+	X := make([]float64, len(lines)-1)    // Vector X -> rating madurez BIM
+	Y := make([]float64, len(lines)-1)    // Vector Y -> desviación porcentual de costos
+	Xind := make([]float64, len(lines)-1) // Vector Xind -> indicador de madurez BIM propuesto
 	var weights []float64
 	var origin bool = false
 
