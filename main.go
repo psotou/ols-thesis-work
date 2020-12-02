@@ -47,12 +47,15 @@ func main() {
 	numObservations := float64(len(Xind))                          // N observations
 	pvalue := twoSidedPValue(corrCoef, numObservations)
 
-	fmt.Printf("Vector Madurez BIM:           %.3f\n", X)
+	fmt.Printf("\nVector Madurez BIM:           %.3f\n", X)
 	fmt.Printf("Vector Indicador Madurez BIM: %.3f\n", Xind)
 	fmt.Printf("Vector Desviación de costos:  %.3f\n", Y)
-	fmt.Println("\n         Coeficiente    p-value       R^2")
-	fmt.Printf("beta_1:       %.4f     %.4f    %.4f\n", beta, pvalue, r2)
-	fmt.Printf("\nYi = %.4f + %.4f * Xi \n", alpha, beta)
+	fmt.Println("\n============================================")
+	fmt.Println("         Coeficiente    p-value    R-squared")
+	fmt.Println("--------------------------------------------")
+	fmt.Printf("beta_1:       %.4f     %.4f       %.4f\n", beta, pvalue, r2)
+	fmt.Println("============================================")
+	fmt.Printf("\nYi = %.4f + %.4f * Xi \n\n", alpha, beta)
 }
 
 func twoSidedPValue(r float64, n float64) float64 {
