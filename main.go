@@ -51,7 +51,7 @@ func main() {
 	fmt.Printf("Vector Indicador Madurez BIM: %.3f\n", Xind)
 	fmt.Printf("Vector Desviación de costos:  %.3f\n", Y)
 	fmt.Println("\n         Coeficiente    p-value       R^2")
-	fmt.Printf("Beta_1:       %.4f     %.4f    %.4f\n", beta, pvalue, r2)
+	fmt.Printf("beta_1:       %.4f     %.4f    %.4f\n", beta, pvalue, r2)
 	fmt.Printf("\nYi = %.4f + %.4f * Xi \n", alpha, beta)
 }
 
