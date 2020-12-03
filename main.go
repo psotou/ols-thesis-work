@@ -61,6 +61,10 @@ func main() {
 	fmt.Println("============================================")
 	fmt.Printf("\nYi = %.4f + %.4f * Xi \n\n", alpha, beta)
 
+	// ==========================================================
+	// PLOTTING STUFF HAPPENS FROM HERE ON
+	// ==========================================================
+
 	p, err := plot.New()
 	if err != nil {
 		panic(err)
@@ -69,8 +73,6 @@ func main() {
 	p.X.Label.Text = "Madurez BIM"
 	p.Y.Label.Text = "Desviación costos"
 	p.Add(plotter.NewGrid())
-
-	// PLOT STUFF HAPPENS FROM HERE ON
 
 	// we generate the point for our estimated function
 	pts := make(plotter.XYs, len(Xind))
