@@ -8,6 +8,10 @@ import (
 	"os"
 	"strconv"
 
+	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotter"
+	"gonum.org/v1/plot/vg"
+
 	"gonum.org/v1/gonum/stat"
 	"gonum.org/v1/gonum/stat/distuv"
 )
@@ -56,6 +60,42 @@ func main() {
 	fmt.Printf("beta_1:       %.4f     %.4f       %.4f\n", beta, pvalue, r2)
 	fmt.Println("============================================")
 	fmt.Printf("\nYi = %.4f + %.4f * Xi \n\n", alpha, beta)
+
+	p, err := plot.New()
+	if err != nil {
+		panic(err)
+	}
+	p.Title.Text = "Modelo desviación de costos versus  madurez BIM"
+	p.X.Label.Text = "Madurez BIM"
+	p.Y.Label.Text = "Desviación costos"
+	p.Add(plotter.NewGrid())
+
+	// PLOT STUFF HAPPENS FROM HERE ON
+
+	// we generate the point for our estimated function
+	pts := make(plotter.XYs, len(Xind))
+	for i := range pts {
+		pts[i].X = X[i]
+		pts[i].Y = alpha + beta*Xind[i]
+	}
+
+	s, err := plotter.NewScatter(pts)
+	if err != nil {
+		panic(err)
+	}
+
+	p.Add(s)
+	p.Legend.Add("Y = a + b * 4/X", s)
+
+	p.X.Min = 0
+	p.X.Max = 6.50
+	p.Y.Min = 0
+	p.Y.Max = 0.38
+
+	// we save to a png file
+	if err := p.Save(7.5*vg.Inch, 5.5*vg.Inch, "ols_function.png"); err != nil {
+		panic(err)
+	}
 }
 
 func twoSidedPValue(r float64, n float64) float64 {
