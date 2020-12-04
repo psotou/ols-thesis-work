@@ -75,10 +75,11 @@ func main() {
 	p.Add(plotter.NewGrid())
 
 	// we generate the point for our estimated function
-	pts := make(plotter.XYs, len(Xind))
+	xvalues := []float64{1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.2, 3.4, 3.6, 3.8, 4, 4.2}
+	pts := make(plotter.XYs, len(xvalues))
 	for i := range pts {
-		pts[i].X = X[i]
-		pts[i].Y = alpha + beta*Xind[i]
+		pts[i].X = 4 / xvalues[i]
+		pts[i].Y = alpha + beta*xvalues[i]
 	}
 
 	s, err := plotter.NewScatter(pts)
@@ -87,12 +88,12 @@ func main() {
 	}
 
 	p.Add(s)
-	p.Legend.Add("Y = a + b * 4/X", s)
+	p.Legend.Add("y = a + b * 4/x", s)
 
 	p.X.Min = 0
-	p.X.Max = 6.50
+	p.X.Max = 4.50
 	p.Y.Min = 0
-	p.Y.Max = 0.38
+	p.Y.Max = 0.4
 
 	// we save to a png file
 	if err := p.Save(7.5*vg.Inch, 5.5*vg.Inch, "ols_function.png"); err != nil {
