@@ -51,15 +51,18 @@ func main() {
 	numObservations := float64(len(Xind))                          // N observations
 	pvalue := twoSidedPValue(corrCoef, numObservations)
 
-	fmt.Printf("\nVector Madurez BIM:           %.3f\n", X)
-	fmt.Printf("Vector Indicador Madurez BIM: %.3f\n", Xind)
-	fmt.Printf("Vector Desviación de costos:  %.3f\n", Y)
+	fmt.Printf("\nMadurez BIM (Xi):               %.3f\n", X)
+	fmt.Printf("Indicador Madurez BIM (4 / Xi): %.3f\n", Xind)
+	fmt.Printf("Desviación de costos (Yi):      %.3f\n", Y)
 	fmt.Println("\n============================================")
 	fmt.Println("         Coeficiente    p-value    R-squared")
 	fmt.Println("--------------------------------------------")
-	fmt.Printf("beta_1:       %.4f     %.4f       %.4f\n", beta, pvalue, r2)
+	fmt.Printf("    B1:       %.4f     %.4f       %.4f\n", beta, pvalue, r2)
 	fmt.Println("============================================")
-	fmt.Printf("\nYi = %.4f + %.4f * Xi \n\n", alpha, beta)
+	fmt.Println("       Ecuación del modelo propuesto")
+	fmt.Println("--------------------------------------------")
+	fmt.Printf("     Yi = %.4f + %.4f * (4 / Xi) \n", alpha, beta)
+	fmt.Println("============================================")
 
 	// ==========================================================
 	// PLOTTING STUFF HAPPENS FROM HERE ON
