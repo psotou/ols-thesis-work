@@ -23,6 +23,7 @@ func main() {
 		fmt.Println("Error: ", err)
 		return
 	}
+	// Cerramos el archivo data.csv
 	defer file.Close()
 
 	// Generamos un reader
