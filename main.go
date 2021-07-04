@@ -18,7 +18,8 @@ import (
 
 func main() {
 	// Abrimos el archivo data.csv
-	file, err := os.Open("data.csv")
+	data := os.Args[1]
+	file, err := os.Open(data)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
@@ -37,8 +38,10 @@ func main() {
 	X := make([]float64, len(lines)-1)    // Vector X -> rating madurez BIM
 	Y := make([]float64, len(lines)-1)    // Vector Y -> desviación porcentual de costos
 	Xind := make([]float64, len(lines)-1) // Vector Xind -> indicador de madurez BIM propuesto
-	var weights []float64
-	var origin bool = false
+	var (
+		weights []float64
+		origin  bool = false
+	)
 
 	for i, line := range lines[1:] {
 		X[i], _ = strconv.ParseFloat(line[1], 64)
