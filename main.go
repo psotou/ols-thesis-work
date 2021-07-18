@@ -24,7 +24,7 @@ var (
 
 func main() {
 	flag.StringVar(&flagFile, "file", "data.csv", "file is the name of the csv file")
-	flag.Float64Var(&flagScale, "mrate", 4.0, "mrate is the maximum rating according to the sale of BIM measurement used")
+	flag.Float64Var(&flagScale, "rmax", 4.0, "mrate is the maximum rating according to the sale of BIM measurement used")
 	flag.Parse()
 
 	// Abrimos el archivo data.csv
@@ -63,10 +63,6 @@ func main() {
 	numObservations := float64(len(Xind))                          // N observations
 	pvalue := twoSidedPValue(corrCoef, numObservations)
 
-	fmt.Println("\nXi  : Madurez BIM")
-	fmt.Printf("%v/Xi: Indicador de inmadurez BIM\n", flagScale)
-	fmt.Println("Yi  : Crecimiento de costos de construcción")
-
 	fmt.Println("\n=================================")
 	fmt.Printf("%10s %10s %7v/Xi\n", "Xi", "Yi", flagScale)
 	fmt.Println("---------------------------------")
@@ -74,6 +70,10 @@ func main() {
 		fmt.Printf("%10.2f %10.2f %10.2f\n", X[i], Y[i], Xind[i])
 	}
 	fmt.Println("---------------------------------")
+
+	fmt.Println("\nXi  : Madurez BIM")
+	fmt.Printf("%v/Xi: Indicador de inmadurez BIM\n", flagScale)
+	fmt.Println("Yi  : Crecimiento de costos de construcción")
 
 	fmt.Println("\n============================================")
 	fmt.Println("         Coeficiente    p-value    R-squared")
@@ -87,10 +87,21 @@ func main() {
 	fmt.Printf("     Yi = %.4f + %.4f * (%v / Xi) \n", alpha, beta, flagScale)
 	fmt.Println("--------------------------------------------")
 
-	// ==========================================================
-	// PLOTTING STUFF HAPPENS FROM HERE ON
-	// ==========================================================
+	// PLOT
+	modelPlot(flagScale, alpha, beta)
+}
 
+func makeRange(min, max int) []float64 {
+	a := make([]float64, (max-min+1)*5)
+	a[0] = 1.0
+	for i := 1; i < len(a); i++ {
+
+		a[i] = 0.2 + a[i-1]
+	}
+	return a
+}
+
+func modelPlot(scale, alpha, beta float64) error {
 	p, err := plot.New()
 	if err != nil {
 		panic(err)
@@ -101,10 +112,10 @@ func main() {
 	p.Add(plotter.NewGrid())
 
 	// we generate the point for our estimated function
-	xvalues := []float64{1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.2, 3.4, 3.6, 3.8, 4, 4.2}
+	xvalues := makeRange(1, int(flagScale))
 	pts := make(plotter.XYs, len(xvalues))
 	for i := range pts {
-		pts[i].X = 4 / xvalues[i]
+		pts[i].X = scale / xvalues[i]
 		pts[i].Y = alpha + beta*xvalues[i]
 	}
 
@@ -114,17 +125,18 @@ func main() {
 	}
 
 	p.Add(s)
-	p.Legend.Add("y = a + b * 4/x", s)
+	p.Legend.Add(fmt.Sprintf("y = a + b * %v/x", flagScale), s)
 
-	p.X.Min = 0
-	p.X.Max = 4.50
+	p.X.Min = 1
+	p.X.Max = flagScale + 0.5
 	p.Y.Min = 0
-	p.Y.Max = 0.4
+	p.Y.Max = 0.35
 
 	// we save to a png file
-	if err := p.Save(7.5*vg.Inch, 5.5*vg.Inch, "ols_function.png"); err != nil {
+	if err := p.Save(7.5*vg.Inch, 5.5*vg.Inch, "model_estimate_plot.png"); err != nil {
 		panic(err)
 	}
+	return err
 }
 
 func twoSidedPValue(r float64, n float64) float64 {
