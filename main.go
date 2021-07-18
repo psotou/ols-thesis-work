@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"io"
 	"math"
@@ -16,15 +17,22 @@ import (
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
+var (
+	flagFile  string
+	flagScale float64
+)
+
 func main() {
+	flag.StringVar(&flagFile, "file", "data.csv", "file is the name of the csv file")
+	flag.Float64Var(&flagScale, "mrate", 4.0, "mrate is the maximum rating according to the sale of BIM measurement used")
+	flag.Parse()
+
 	// Abrimos el archivo data.csv
-	data := os.Args[1]
-	file, err := os.Open(data)
+	file, err := os.Open(flagFile)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
 	}
-	// Cerramos el archivo data.csv
 	defer file.Close()
 
 	// Generamos un reader
@@ -46,7 +54,7 @@ func main() {
 	for i, line := range lines[1:] {
 		X[i], _ = strconv.ParseFloat(line[1], 64)
 		Y[i], _ = strconv.ParseFloat(line[0], 64)
-		Xind[i] = 4 / X[i]
+		Xind[i] = flagScale / X[i]
 	}
 
 	alpha, beta := stat.LinearRegression(Xind, Y, weights, origin) // Vector Beta, con alpha = beta_0
@@ -55,18 +63,29 @@ func main() {
 	numObservations := float64(len(Xind))                          // N observations
 	pvalue := twoSidedPValue(corrCoef, numObservations)
 
-	fmt.Printf("\nMadurez BIM (Xi):               %.3f\n", X)
-	fmt.Printf("Indicador Madurez BIM (4 / Xi): %.3f\n", Xind)
-	fmt.Printf("Desviación de costos (Yi):      %.3f\n", Y)
+	fmt.Println("\nXi  : Madurez BIM")
+	fmt.Printf("%v/Xi: Indicador de inmadurez BIM\n", flagScale)
+	fmt.Println("Yi  : Crecimiento de costos de construcción")
+
+	fmt.Println("\n=================================")
+	fmt.Printf("%10s %10s %7v/Xi\n", "Xi", "Yi", flagScale)
+	fmt.Println("---------------------------------")
+	for i := range X {
+		fmt.Printf("%10.2f %10.2f %10.2f\n", X[i], Y[i], Xind[i])
+	}
+	fmt.Println("---------------------------------")
+
 	fmt.Println("\n============================================")
 	fmt.Println("         Coeficiente    p-value    R-squared")
 	fmt.Println("--------------------------------------------")
 	fmt.Printf("    B1:       %.4f     %.4f       %.4f\n", beta, pvalue, r2)
+	fmt.Println("--------------------------------------------")
+	fmt.Printf("\n\n")
 	fmt.Println("============================================")
 	fmt.Println("       Ecuación del modelo propuesto")
 	fmt.Println("--------------------------------------------")
-	fmt.Printf("     Yi = %.4f + %.4f * (4 / Xi) \n", alpha, beta)
-	fmt.Println("============================================")
+	fmt.Printf("     Yi = %.4f + %.4f * (%v / Xi) \n", alpha, beta, flagScale)
+	fmt.Println("--------------------------------------------")
 
 	// ==========================================================
 	// PLOTTING STUFF HAPPENS FROM HERE ON
