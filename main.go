@@ -17,6 +17,19 @@ import (
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
+type Stats struct {
+	Beta
+	RSquared        float64
+	CorrCoef        float64
+	NumObservations float64
+	PValue          float64
+}
+
+type Beta struct {
+	Beta0 float64
+	Beta1 float64
+}
+
 var (
 	flagFile  string
 	flagScale float64
@@ -27,11 +40,43 @@ func main() {
 	flag.Float64Var(&flagScale, "rmax", 4.0, "mrate is the maximum rating according to the sale of BIM measurement used")
 	flag.Parse()
 
+	lines := readFile(flagFile)
+	st, X, Y, Xind := statsValues(lines)
+
+	fmt.Println("\n============================================")
+	fmt.Printf("%13s %10s %7v/Xi\n", "Xi", "Yi", flagScale)
+	fmt.Println("--------------------------------------------")
+	for i := range X {
+		fmt.Printf("%13.2f %10.2f %10.2f\n", X[i], Y[i], Xind[i])
+	}
+	fmt.Println("--------------------------------------------")
+
+	fmt.Println("\nXi  : nivel de madurez BIM")
+	fmt.Printf("%v/Xi: indicador de inmadurez BIM\n", flagScale)
+	fmt.Println("Yi  : crecimiento de costos de construcción")
+
+	fmt.Println("\n============================================")
+	fmt.Println("       Relación funcional estimada")
+	fmt.Println("--------------------------------------------")
+	fmt.Printf("     Yi = %.4f + %.4f * (%v / Xi) \n", st.Beta.Beta0, st.Beta.Beta1, flagScale)
+	fmt.Printf("--------------------------------------------\n\n")
+	fmt.Println("\n============================================")
+	fmt.Println("         Coeficiente    p-value    R-squared")
+	fmt.Println("--------------------------------------------")
+	fmt.Printf("    B1:       %.4f     %.4f       %.4f\n", st.Beta.Beta1, st.PValue, st.RSquared)
+	fmt.Println("--------------------------------------------")
+	fmt.Printf("\n\n")
+
+	// // PLOT
+	modelPlot(flagScale, st.Beta.Beta0, st.Beta.Beta1)
+}
+
+func readFile(dataFile string) [][]string {
 	// Abrimos el archivo data.csv
-	file, err := os.Open(flagFile)
+	file, err := os.Open(dataFile)
 	if err != nil {
 		fmt.Println("Error: ", err)
-		return
+		panic(err)
 	}
 	defer file.Close()
 
@@ -40,55 +85,33 @@ func main() {
 	lines, err := reader.ReadAll()
 	if err == io.EOF {
 		fmt.Println("Error: ", err)
-		return
+		panic(err)
 	}
+	return lines
+}
 
-	X := make([]float64, len(lines)-1)    // Vector X -> rating madurez BIM
-	Y := make([]float64, len(lines)-1)    // Vector Y -> desviación porcentual de costos
-	Xind := make([]float64, len(lines)-1) // Vector Xind -> indicador de madurez BIM propuesto
+func statsValues(data [][]string) (Stats, []float64, []float64, []float64) {
+	var stVal Stats
+	X := make([]float64, len(data)-1)    // Vector X -> rating madurez BIM
+	Y := make([]float64, len(data)-1)    // Vector Y -> desviación porcentual de costos
+	Xind := make([]float64, len(data)-1) // Vector Xind -> indicador de madurez BIM propuesto
 	var (
 		weights []float64
 		origin  bool = false
 	)
 
-	for i, line := range lines[1:] {
+	for i, line := range data[1:] {
 		X[i], _ = strconv.ParseFloat(line[1], 64)
 		Y[i], _ = strconv.ParseFloat(line[0], 64)
 		Xind[i] = flagScale / X[i]
 	}
 
-	alpha, beta := stat.LinearRegression(Xind, Y, weights, origin) // Vector Beta, con alpha = beta_0
-	r2 := stat.RSquared(Xind, Y, weights, alpha, beta)             // Calculated r squared
-	corrCoef := stat.Correlation(Xind, Y, weights)                 // calculated correlation coefficient
-	numObservations := float64(len(Xind))                          // N observations
-	pvalue := twoSidedPValue(corrCoef, numObservations)
-
-	fmt.Println("\n=================================")
-	fmt.Printf("%10s %10s %7v/Xi\n", "Xi", "Yi", flagScale)
-	fmt.Println("---------------------------------")
-	for i := range X {
-		fmt.Printf("%10.2f %10.2f %10.2f\n", X[i], Y[i], Xind[i])
-	}
-	fmt.Println("---------------------------------")
-
-	fmt.Println("\nXi  : Madurez BIM")
-	fmt.Printf("%v/Xi: Indicador de inmadurez BIM\n", flagScale)
-	fmt.Println("Yi  : Crecimiento de costos de construcción")
-
-	fmt.Println("\n============================================")
-	fmt.Println("         Coeficiente    p-value    R-squared")
-	fmt.Println("--------------------------------------------")
-	fmt.Printf("    B1:       %.4f     %.4f       %.4f\n", beta, pvalue, r2)
-	fmt.Println("--------------------------------------------")
-	fmt.Printf("\n\n")
-	fmt.Println("============================================")
-	fmt.Println("       Ecuación del modelo propuesto")
-	fmt.Println("--------------------------------------------")
-	fmt.Printf("     Yi = %.4f + %.4f * (%v / Xi) \n", alpha, beta, flagScale)
-	fmt.Println("--------------------------------------------")
-
-	// PLOT
-	modelPlot(flagScale, alpha, beta)
+	stVal.Beta.Beta0, stVal.Beta.Beta1 = stat.LinearRegression(Xind, Y, weights, origin)
+	stVal.RSquared = stat.RSquared(Xind, Y, weights, stVal.Beta.Beta0, stVal.Beta.Beta1)
+	stVal.CorrCoef = stat.Correlation(Xind, Y, weights)
+	stVal.NumObservations = float64(len(Xind))
+	stVal.PValue = twoSidedPValue(stVal.CorrCoef, stVal.NumObservations)
+	return stVal, X, Y, Xind
 }
 
 func makeRange(min, max int) []float64 {
