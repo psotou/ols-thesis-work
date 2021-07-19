@@ -51,10 +51,6 @@ func main() {
 	}
 	fmt.Println("--------------------------------------------")
 
-	// fmt.Println("\nXi  : nivel de madurez BIM")
-	// fmt.Printf("%v/Xi: indicador de inmadurez BIM\n", flagScale)
-	// fmt.Println("Yi  : crecimiento de costos de construcción")
-
 	fmt.Println("\n============================================")
 	fmt.Printf("%35s\n", "Vector coeficientes estimados")
 	fmt.Println("--------------------------------------------")
