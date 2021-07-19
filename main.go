@@ -37,7 +37,7 @@ var (
 
 func main() {
 	flag.StringVar(&flagFile, "file", "data.csv", "file is the name of the csv file")
-	flag.Float64Var(&flagScale, "rmax", 4.0, "mrate is the maximum rating according to the sale of BIM measurement used")
+	flag.Float64Var(&flagScale, "rmax", 4.0, "rmax is the maximum rating according to the sale of BIM measurement used")
 	flag.Parse()
 
 	lines := readFile(flagFile)
