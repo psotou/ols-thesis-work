@@ -51,16 +51,24 @@ func main() {
 	}
 	fmt.Println("--------------------------------------------")
 
-	fmt.Println("\nXi  : nivel de madurez BIM")
-	fmt.Printf("%v/Xi: indicador de inmadurez BIM\n", flagScale)
-	fmt.Println("Yi  : crecimiento de costos de construcción")
+	// fmt.Println("\nXi  : nivel de madurez BIM")
+	// fmt.Printf("%v/Xi: indicador de inmadurez BIM\n", flagScale)
+	// fmt.Println("Yi  : crecimiento de costos de construcción")
+
+	fmt.Println("\n============================================")
+	fmt.Printf("%35s\n", "Vector coeficientes estimados")
+	fmt.Println("--------------------------------------------")
+	fmt.Printf("%18s %7.4f\n", "B0 =", st.Beta.Beta0)
+	fmt.Printf("%18s %7.4f\n", "B1 =", st.Beta.Beta1)
+	fmt.Println("--------------------------------------------")
 
 	fmt.Println("\n============================================")
 	fmt.Println("       Relación funcional estimada")
 	fmt.Println("--------------------------------------------")
 	fmt.Printf("     Yi = %.4f + %.4f * (%v / Xi) \n", st.Beta.Beta0, st.Beta.Beta1, flagScale)
 	fmt.Printf("--------------------------------------------\n\n")
-	fmt.Println("\n============================================")
+
+	fmt.Println("============================================")
 	fmt.Println("         Coeficiente    p-value    R-squared")
 	fmt.Println("--------------------------------------------")
 	fmt.Printf("    B1:       %.4f     %.4f       %.4f\n", st.Beta.Beta1, st.PValue, st.RSquared)
@@ -129,7 +137,7 @@ func modelPlot(scale, alpha, beta float64) error {
 	if err != nil {
 		panic(err)
 	}
-	p.Title.Text = "Modelo desviación de costos versus  madurez BIM"
+	p.Title.Text = "Crecimiento costos de construcción versus madurez BIM"
 	p.X.Label.Text = "Nivel de madurez BIM"
 	p.Y.Label.Text = "Crecimiento costos de construcción"
 	p.Add(plotter.NewGrid())
