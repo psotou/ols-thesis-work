@@ -130,8 +130,8 @@ func modelPlot(scale, alpha, beta float64) error {
 		panic(err)
 	}
 	p.Title.Text = "Modelo desviación de costos versus  madurez BIM"
-	p.X.Label.Text = "Madurez BIM"
-	p.Y.Label.Text = "Desviación costos"
+	p.X.Label.Text = "Nivel de madurez BIM"
+	p.Y.Label.Text = "Crecimiento costos de construcción"
 	p.Add(plotter.NewGrid())
 
 	// we generate the point for our estimated function
