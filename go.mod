@@ -1,9 +1,8 @@
-module ols_implementation_thesis
+module ols-mem
 
-go 1.15
+go 1.16
 
 require (
-	golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 // indirect
-	gonum.org/v1/gonum v0.8.1
-	gonum.org/v1/plot v0.8.1
+	gonum.org/v1/gonum v0.9.3
+	gonum.org/v1/plot v0.9.0
 )
